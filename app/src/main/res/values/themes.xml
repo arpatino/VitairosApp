@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Tema de arranque (ventana antes de que Compose dibuje). La UI real usa VitairosTheme. -->
+    <style name="Theme.Vitairos" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/hueso</item>
+        <item name="android:statusBarColor">@color/verde_noche</item>
+        <item name="android:navigationBarColor">@color/verde_noche</item>
+    </style>
+</resources>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Paleta oficial: VITAIROS Industrial AI – Guía visual de referencia -->
+<resources>
+    <color name="verde_noche">#081D16</color>
+    <color name="verde_profundo">#102B23</color>
+    <color name="verde_mineral">#1B342D</color>
+    <color name="hueso">#FBF7F1</color>
+    <color name="niebla">#E8EFE9</color>
+    <color name="cobre">#DD7A52</color>
+    <color name="oro">#D9B46C</color>
+    <color name="acero">#AAB6B7</color>
+</resources>

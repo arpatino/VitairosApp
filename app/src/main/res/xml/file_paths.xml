@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- filesDir/attachments (privado). No se expone almacenamiento público. -->
+    <files-path name="attachments" path="attachments/" />
+</paths>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">VITAIROS</string>
+
+    <!-- Estados de reporte (siempre texto + ícono, nunca solo color) -->
+    <string name="status_draft">Borrador</string>
+    <string name="status_queued">En cola</string>
+    <string name="status_sending">Enviando</string>
+    <string name="status_synced">Sincronizado</string>
+    <string name="status_error">Error</string>
+    <string name="status_needs_correction">Requiere corrección</string>
+
+    <string name="simulation_badge">Simulación</string>
+    <string name="placeholder_screen">Pantalla en construcción</string>
+
+    <string name="nav_login">Ingreso</string>
+    <string name="nav_dashboard">Inicio</string>
+    <string name="nav_new_report">Nuevo reporte</string>
+    <string name="nav_capture">Captura y adjuntos</string>
+    <string name="nav_report_detail">Detalle del reporte</string>
+    <string name="nav_queue">Cola de envíos</string>
+    <string name="nav_history">Historial</string>
+    <string name="nav_settings">Ajustes</string>
+</resources>
