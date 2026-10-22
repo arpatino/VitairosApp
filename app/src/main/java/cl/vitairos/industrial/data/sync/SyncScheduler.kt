@@ -13,12 +13,17 @@ import java.util.concurrent.TimeUnit
 class SyncScheduler(context: Context) {
     private val workManager = WorkManager.getInstance(context)
 
-    fun schedule() {
-        val request = OneTimeWorkRequestBuilder<SyncWorker>()
+    fun schedule(initialDelaySeconds: Long = 0L) {
+        val builder = OneTimeWorkRequestBuilder<SyncWorker>()
             .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
-            .setBackoffCriteria(BackoffPolicy.LINEAR, RetryPolicy.BACKOFF_SECONDS.first(), TimeUnit.SECONDS)
-            .build()
-        workManager.enqueueUniqueWork(UNIQUE_NAME, ExistingWorkPolicy.KEEP, request)
+            .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, RetryPolicy.BACKOFF_SECONDS.first(), TimeUnit.SECONDS)
+
+        if (initialDelaySeconds > 0L) {
+            builder.setInitialDelay(initialDelaySeconds, TimeUnit.SECONDS)
+        }
+
+        val request = builder.build()
+        workManager.enqueueUniqueWork(UNIQUE_NAME, ExistingWorkPolicy.REPLACE, request)
     }
 
     companion object {

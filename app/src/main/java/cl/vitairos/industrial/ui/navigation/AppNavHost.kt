@@ -69,6 +69,8 @@ fun AppNavHost(
             NewReportScreen(
                 catalogRepository = container.catalogRepository,
                 reportRepository = container.reportRepository,
+                fileStore = container.fileStore,
+                syncRepository = container.syncRepository,
                 activeUserId = currentUser?.id ?: "u-operador",
                 onReportSaved = {
                     navController.popBackStack()
@@ -91,7 +93,11 @@ fun AppNavHost(
         }
 
         composable(Routes.QUEUE) {
-            QueueScreen(onBack = { navController.popBackStack() })
+            QueueScreen(
+                reportRepository = container.reportRepository,
+                syncRepository = container.syncRepository,
+                onBack = { navController.popBackStack() },
+            )
         }
 
         composable(Routes.HISTORY) {

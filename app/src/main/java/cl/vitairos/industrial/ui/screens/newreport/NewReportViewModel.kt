@@ -1,19 +1,25 @@
 package cl.vitairos.industrial.ui.screens.newreport
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import cl.vitairos.industrial.data.local.files.PrivateFileStore
+import cl.vitairos.industrial.domain.model.Attachment
 import cl.vitairos.industrial.domain.model.Process
 import cl.vitairos.industrial.domain.model.Report
 import cl.vitairos.industrial.domain.model.ReportStatus
 import cl.vitairos.industrial.domain.model.ReportType
 import cl.vitairos.industrial.domain.repository.CatalogRepository
 import cl.vitairos.industrial.domain.repository.ReportRepository
+import cl.vitairos.industrial.domain.repository.SyncRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.UUID
 
 data class NewReportUiState(
@@ -25,6 +31,8 @@ data class NewReportUiState(
     val shift: String = "Turno 1 (Mañana)",
     val areaOrSite: String = "",
     val observations: String = "",
+    val attachments: List<Attachment> = emptyList(),
+    val attachmentError: String? = null,
     val areaError: String? = null,
     val observationsError: String? = null,
     val isFormValid: Boolean = false,
@@ -35,6 +43,8 @@ data class NewReportUiState(
 class NewReportViewModel(
     private val catalogRepository: CatalogRepository,
     private val reportRepository: ReportRepository,
+    private val fileStore: PrivateFileStore,
+    private val syncRepository: SyncRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(NewReportUiState())
@@ -94,6 +104,72 @@ class NewReportViewModel(
         _uiState.update { it.copy(shift = shift) }
     }
 
+    // Crea el archivo temporal en el almacenamiento privado para pasarle la Uri a la camara
+    fun prepareCameraFile(): Pair<String, Uri> {
+        return fileStore.createTempCameraFile()
+    }
+
+    // Se llama cuando la camara termina de tomar la foto
+    fun onCameraPhotoCaptured(fileName: String, success: Boolean) {
+        if (!success) {
+            fileStore.delete(fileName)
+            return
+        }
+        viewModelScope.launch {
+            val current = _uiState.value
+            val result = withContext(Dispatchers.IO) {
+                fileStore.processCameraPhoto(
+                    reportId = current.folio,
+                    fileName = fileName,
+                    currentCount = current.attachments.size
+                )
+            }
+            val newAttachment = result.first
+            val errorMsg = result.second
+
+            if (newAttachment != null) {
+                val updatedList = current.attachments + newAttachment
+                _uiState.update { it.copy(attachments = updatedList, attachmentError = null) }
+            } else {
+                _uiState.update { it.copy(attachmentError = errorMsg) }
+            }
+            validateForm()
+        }
+    }
+
+    // Se llama cuando el usuario selecciona una imagen o PDF desde el selector de archivos
+    fun onFilePicked(uri: Uri?) {
+        if (uri == null) return
+        viewModelScope.launch {
+            val current = _uiState.value
+            val result = withContext(Dispatchers.IO) {
+                fileStore.saveFromPickerUri(
+                    reportId = current.folio,
+                    uri = uri,
+                    currentCount = current.attachments.size
+                )
+            }
+            val newAttachment = result.first
+            val errorMsg = result.second
+
+            if (newAttachment != null) {
+                val updatedList = current.attachments + newAttachment
+                _uiState.update { it.copy(attachments = updatedList, attachmentError = null) }
+            } else {
+                _uiState.update { it.copy(attachmentError = errorMsg) }
+            }
+            validateForm()
+        }
+    }
+
+    // Permite eliminar un adjunto antes de confirmar/guardar el reporte
+    fun removeAttachment(attachment: Attachment) {
+        fileStore.delete(attachment.relativePath)
+        val updatedList = _uiState.value.attachments.filter { it.id != attachment.id }
+        _uiState.update { it.copy(attachments = updatedList, attachmentError = null) }
+        validateForm()
+    }
+
     private fun validateForm() {
         val current = _uiState.value
         val isValid = current.areaOrSite.isNotBlank() &&
@@ -101,6 +177,7 @@ class NewReportViewModel(
             current.observations.isNotBlank() &&
             current.selectedTypeId.isNotBlank() &&
             current.selectedProcessId.isNotBlank() &&
+            current.attachments.isNotEmpty() && // Al menos 1 adjunto requerido (Cuestionario §4 y §5)
             current.areaError == null &&
             current.observationsError == null
 
@@ -125,7 +202,7 @@ class NewReportViewModel(
                 shift = current.shift,
                 observations = current.observations.trim(),
                 status = ReportStatus.QUEUED, // Queda encolado en Room para despacho
-                attachments = emptyList(),
+                attachments = current.attachments,
                 attemptCount = 0,
                 lastSyncAtMillis = null,
                 version = 1,
@@ -133,6 +210,8 @@ class NewReportViewModel(
             )
 
             reportRepository.save(newReport)
+            // Encolamos el reporte en WorkManager para sincronizacion en segundo plano
+            syncRepository.enqueue(newReport.id)
             _uiState.update { it.copy(isSaving = false, saveSuccess = true) }
         }
     }
@@ -141,11 +220,12 @@ class NewReportViewModel(
         fun factory(
             catalogRepository: CatalogRepository,
             reportRepository: ReportRepository,
+            fileStore: PrivateFileStore,
+            syncRepository: SyncRepository,
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T =
-                NewReportViewModel(catalogRepository, reportRepository) as T
+                NewReportViewModel(catalogRepository, reportRepository, fileStore, syncRepository) as T
         }
     }
 }
-

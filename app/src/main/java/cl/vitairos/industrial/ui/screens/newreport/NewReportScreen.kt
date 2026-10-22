@@ -1,5 +1,9 @@
 package cl.vitairos.industrial.ui.screens.newreport
 
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -7,7 +11,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,8 +27,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -48,13 +55,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import cl.vitairos.industrial.data.local.files.PrivateFileStore
+import cl.vitairos.industrial.domain.model.Attachment
+import cl.vitairos.industrial.domain.model.AttachmentKind
 import cl.vitairos.industrial.domain.repository.CatalogRepository
 import cl.vitairos.industrial.domain.repository.ReportRepository
+import cl.vitairos.industrial.domain.repository.SyncRepository
 import cl.vitairos.industrial.ui.components.PrimaryButton
 import cl.vitairos.industrial.ui.theme.Acero
 import cl.vitairos.industrial.ui.theme.Cobre
@@ -63,6 +77,7 @@ import cl.vitairos.industrial.ui.theme.Oro
 import cl.vitairos.industrial.ui.theme.VerdeMineral
 import cl.vitairos.industrial.ui.theme.VerdeNoche
 import cl.vitairos.industrial.ui.theme.VerdeProfundo
+import coil3.compose.AsyncImage
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -70,19 +85,54 @@ import kotlinx.coroutines.delay
 fun NewReportScreen(
     catalogRepository: CatalogRepository,
     reportRepository: ReportRepository,
+    fileStore: PrivateFileStore,
+    syncRepository: SyncRepository,
     activeUserId: String,
     onReportSaved: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: NewReportViewModel = viewModel(
-        factory = NewReportViewModel.factory(catalogRepository, reportRepository),
+        factory = NewReportViewModel.factory(catalogRepository, reportRepository, fileStore, syncRepository),
     ),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     var typeExpanded by remember { mutableStateOf(false) }
     var processExpanded by remember { mutableStateOf(false) }
     var shiftExpanded by remember { mutableStateOf(false) }
+
+    // Guardamos el nombre del archivo temporal cuando abrimos la camara
+    var pendingCameraFileName by remember { mutableStateOf<String?>(null) }
+
+    // Launcher nativo para tomar foto con la camara y guardarla en nuestra Uri privada
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture()
+    ) { success ->
+        val fileName = pendingCameraFileName
+        if (fileName != null) {
+            viewModel.onCameraPhotoCaptured(fileName, success)
+            pendingCameraFileName = null
+        }
+    }
+
+    // Launcher para pedir permiso de camara si el usuario aun no lo ha aceptado
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            val pair = viewModel.prepareCameraFile()
+            pendingCameraFileName = pair.first
+            cameraLauncher.launch(pair.second)
+        }
+    }
+
+    // Launcher nativo del selector de archivos privado (acepta JPG, PNG y PDF)
+    val filePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        viewModel.onFilePicked(uri)
+    }
 
     LaunchedEffect(uiState.saveSuccess) {
         if (uiState.saveSuccess) {
@@ -121,7 +171,7 @@ fun NewReportScreen(
                         color = MaterialTheme.colorScheme.onBackground,
                     )
                     Text(
-                        text = "PASO 1: METADATA Y TRAZABILIDAD LOCAL",
+                        text = "METADATA, CAPTURA Y VALIDACIÓN LOCAL",
                         style = MaterialTheme.typography.labelSmall,
                         color = Oro,
                     )
@@ -151,7 +201,7 @@ fun NewReportScreen(
                         Icon(Icons.Default.Check, contentDescription = null, tint = Oro, modifier = Modifier.size(20.dp))
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Reporte ${uiState.folio} persistido en base Room local. Redirigiendo...",
+                            text = "Reporte ${uiState.folio} encolado en Room + WorkManager. Redirigiendo...",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onBackground,
                             fontWeight = FontWeight.Bold,
@@ -426,6 +476,149 @@ fun NewReportScreen(
                         )
                     }
                 }
+
+                // SECCIÓN AVANCE 2: Captura con Cámara y Selector Privado de Archivos
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = VerdeProfundo),
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .border(1.dp, VerdeMineral, RoundedCornerShape(8.dp)),
+                ) {
+                    Column(modifier = Modifier.padding(12.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Column {
+                                Text(
+                                    text = "EVIDENCIA DOCUMENTAL (ADJUNTOS *)",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Oro,
+                                )
+                                Text(
+                                    text = "Formatos: JPG, PNG, PDF · Máx 10 MB · Compresión JPEG 80%",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = Acero,
+                                )
+                            }
+                            Text(
+                                text = "${uiState.attachments.size} / 5",
+                                style = MaterialTheme.typography.labelMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = if (uiState.attachments.isNotEmpty()) Oro else Cobre,
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        // Botones para Cámara Nativa y Selector de Archivos
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            Button(
+                                onClick = {
+                                    val hasPermission = ContextCompat.checkSelfPermission(
+                                        context,
+                                        Manifest.permission.CAMERA
+                                    ) == PackageManager.PERMISSION_GRANTED
+
+                                    if (hasPermission) {
+                                        val pair = viewModel.prepareCameraFile()
+                                        pendingCameraFileName = pair.first
+                                        cameraLauncher.launch(pair.second)
+                                    } else {
+                                        cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                                    }
+                                },
+                                enabled = uiState.attachments.size < 5,
+                                modifier = Modifier.weight(1f),
+                                shape = RoundedCornerShape(6.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Cobre,
+                                    contentColor = VerdeNoche,
+                                ),
+                            ) {
+                                Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = "CÁMARA",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.Bold,
+                                )
+                            }
+
+                            Button(
+                                onClick = {
+                                    filePickerLauncher.launch(
+                                        arrayOf("image/jpeg", "image/png", "application/pdf")
+                                    )
+                                },
+                                enabled = uiState.attachments.size < 5,
+                                modifier = Modifier.weight(1f),
+                                shape = RoundedCornerShape(6.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Oro,
+                                    contentColor = VerdeNoche,
+                                ),
+                            ) {
+                                Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = "ARCHIVO / PDF",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.Bold,
+                                )
+                            }
+                        }
+
+                        // Mensaje de error de validación (ej. > 10 MB o formato no permitido)
+                        AnimatedVisibility(
+                            visible = uiState.attachmentError != null,
+                            enter = fadeIn() + expandVertically(),
+                            exit = fadeOut() + shrinkVertically(),
+                        ) {
+                            uiState.attachmentError?.let { err ->
+                                Row(
+                                    modifier = Modifier.padding(top = 8.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    Icon(Icons.Default.Warning, contentDescription = null, tint = Cobre, modifier = Modifier.size(16.dp))
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text(
+                                        text = err,
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = Cobre,
+                                    )
+                                }
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        // Vista previa básica de los archivos adjuntos cargados
+                        if (uiState.attachments.isEmpty()) {
+                            Text(
+                                text = "Debe adjuntar al menos 1 fotografía o documento PDF para guardar el reporte.",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = Acero,
+                            )
+                        } else {
+                            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                                uiState.attachments.forEach { item ->
+                                    AttachmentPreviewRow(
+                                        attachment = item,
+                                        fileStore = fileStore,
+                                        onRemove = { viewModel.removeAttachment(item) },
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.height(10.dp))
@@ -437,9 +630,97 @@ fun NewReportScreen(
                 }
             } else {
                 PrimaryButton(
-                    text = "GUARDAR EN COLA LOCAL (ROOM)",
+                    text = "GUARDAR Y ENCOLAR SINCRONIZACIÓN",
                     onClick = { viewModel.saveReport(activeUserId) },
                     enabled = uiState.isFormValid,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun AttachmentPreviewRow(
+    attachment: Attachment,
+    fileStore: PrivateFileStore,
+    onRemove: () -> Unit,
+) {
+    val sizeKb = attachment.sizeBytes / 1024
+    val sizeText = if (sizeKb >= 1024) {
+        String.format("%.2f MB", sizeKb / 1024f)
+    } else {
+        "$sizeKb KB"
+    }
+
+    Surface(
+        color = VerdeNoche,
+        shape = RoundedCornerShape(6.dp),
+        border = androidx.compose.foundation.BorderStroke(1.dp, VerdeMineral),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.weight(1f),
+            ) {
+                if (attachment.kind == AttachmentKind.IMAGE) {
+                    val file = fileStore.fileFor(attachment.relativePath)
+                    AsyncImage(
+                        model = file,
+                        contentDescription = "Vista previa",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(44.dp)
+                            .clip(RoundedCornerShape(4.dp))
+                            .border(1.dp, Oro, RoundedCornerShape(4.dp)),
+                    )
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .size(44.dp)
+                            .background(VerdeProfundo, RoundedCornerShape(4.dp))
+                            .border(1.dp, Cobre, RoundedCornerShape(4.dp)),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(
+                            text = "PDF",
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = Cobre,
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.width(10.dp))
+
+                Column {
+                    Text(
+                        text = attachment.fileName,
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        maxLines = 1,
+                    )
+                    Text(
+                        text = "${attachment.mimeType} · $sizeText (Almacenamiento privado)",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Niebla,
+                    )
+                }
+            }
+
+            IconButton(onClick = onRemove) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = "Eliminar adjunto",
+                    tint = Cobre,
+                    modifier = Modifier.size(18.dp),
                 )
             }
         }
