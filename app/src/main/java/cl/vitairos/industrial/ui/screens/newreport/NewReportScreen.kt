@@ -221,7 +221,7 @@ fun NewReportScreen(
                         value = currentType,
                         onValueChange = {},
                         readOnly = true,
-                        label = { Text("Tipo de Reporte (Catálogo Cerrado *)", style = MaterialTheme.typography.bodySmall) },
+                        label = { Text("Tipo de Reporte (Catálogo Cerrado *)", color = Hueso, style = MaterialTheme.typography.bodySmall) },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = typeExpanded) },
                         modifier = Modifier
                             .menuAnchor()
@@ -231,6 +231,8 @@ fun NewReportScreen(
                             unfocusedBorderColor = VerdeMineral,
                             focusedTextColor = Acero,
                             unfocusedTextColor = Acero,
+                            focusedLabelColor = Hueso,
+                            unfocusedLabelColor = Hueso,
                         ),
                     )
 
@@ -261,7 +263,7 @@ fun NewReportScreen(
                         value = currentProcess,
                         onValueChange = {},
                         readOnly = true,
-                        label = { Text("Proceso Asociado (Lista Fija *)", style = MaterialTheme.typography.bodySmall) },
+                        label = { Text("Proceso Asociado (Lista Fija *)", color = Hueso, style = MaterialTheme.typography.bodySmall) },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = processExpanded) },
                         modifier = Modifier
                             .menuAnchor()
@@ -271,6 +273,8 @@ fun NewReportScreen(
                             unfocusedBorderColor = VerdeMineral,
                             focusedTextColor = Acero,
                             unfocusedTextColor = Acero,
+                            focusedLabelColor = Hueso,
+                            unfocusedLabelColor = Hueso,
                         ),
                     )
 
@@ -300,7 +304,7 @@ fun NewReportScreen(
                         value = uiState.shift,
                         onValueChange = {},
                         readOnly = true,
-                        label = { Text("Turno Operacional *", style = MaterialTheme.typography.bodySmall) },
+                        label = { Text("Turno Operacional *", color = Hueso, style = MaterialTheme.typography.bodySmall) },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = shiftExpanded) },
                         modifier = Modifier
                             .menuAnchor()
@@ -310,6 +314,8 @@ fun NewReportScreen(
                             unfocusedBorderColor = VerdeMineral,
                             focusedTextColor = Acero,
                             unfocusedTextColor = Acero,
+                            focusedLabelColor = Hueso,
+                            unfocusedLabelColor = Hueso,
                         ),
                     )
 
@@ -335,7 +341,7 @@ fun NewReportScreen(
                     OutlinedTextField(
                         value = uiState.areaOrSite,
                         onValueChange = viewModel::onAreaChange,
-                        label = { Text("Área / Faena Específica *", style = MaterialTheme.typography.bodySmall) },
+                        label = { Text("Área / Faena Específica *", color = Hueso, style = MaterialTheme.typography.bodySmall) },
                         placeholder = { Text("Ej: Planta Concentradora - Correa 04", color = Acero) },
                         singleLine = true,
                         isError = uiState.areaError != null,
@@ -353,6 +359,8 @@ fun NewReportScreen(
                             errorBorderColor = Cobre,
                             focusedTextColor = Acero,
                             unfocusedTextColor = Acero,
+                            focusedLabelColor = Hueso,
+                            unfocusedLabelColor = Hueso,
                         ),
                     )
 
@@ -378,7 +386,7 @@ fun NewReportScreen(
                     OutlinedTextField(
                         value = uiState.observations,
                         onValueChange = viewModel::onObservationsChange,
-                        label = { Text("Observaciones de Campo *", style = MaterialTheme.typography.bodySmall) },
+                        label = { Text("Observaciones de Campo *", color = Hueso, style = MaterialTheme.typography.bodySmall) },
                         placeholder = { Text("Ingrese notas sobre anomalías o inspección...", color = Acero) },
                         minLines = 3,
                         maxLines = 5,
@@ -397,6 +405,8 @@ fun NewReportScreen(
                             errorBorderColor = Cobre,
                             focusedTextColor = Acero,
                             unfocusedTextColor = Acero,
+                            focusedLabelColor = Hueso,
+                            unfocusedLabelColor = Hueso,
                         ),
                     )
 
