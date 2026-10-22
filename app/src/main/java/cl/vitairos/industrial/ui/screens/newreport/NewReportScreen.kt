@@ -57,6 +57,7 @@ import cl.vitairos.industrial.domain.repository.CatalogRepository
 import cl.vitairos.industrial.domain.repository.ReportRepository
 import cl.vitairos.industrial.ui.components.PrimaryButton
 import cl.vitairos.industrial.ui.theme.Acero
+import cl.vitairos.industrial.ui.theme.Hueso
 import cl.vitairos.industrial.ui.theme.Cobre
 import cl.vitairos.industrial.ui.theme.Niebla
 import cl.vitairos.industrial.ui.theme.Oro
@@ -109,7 +110,7 @@ fun NewReportScreen(
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Volver",
-                        tint = MaterialTheme.colorScheme.onBackground,
+                        tint = Hueso,
                     )
                 }
                 Spacer(modifier = Modifier.width(6.dp))
@@ -118,7 +119,7 @@ fun NewReportScreen(
                         text = "REGISTRO DE REPORTE",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onBackground,
+                        color = Hueso,
                     )
                     Text(
                         text = "PASO 1: METADATA Y TRAZABILIDAD LOCAL",
@@ -153,7 +154,7 @@ fun NewReportScreen(
                         Text(
                             text = "Reporte ${uiState.folio} persistido en base Room local. Redirigiendo...",
                             style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onBackground,
+                            color = Acero,
                             fontWeight = FontWeight.Bold,
                         )
                     }
@@ -228,8 +229,8 @@ fun NewReportScreen(
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = Oro,
                             unfocusedBorderColor = VerdeMineral,
-                            focusedTextColor = MaterialTheme.colorScheme.onBackground,
-                            unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
+                            focusedTextColor = Acero,
+                            unfocusedTextColor = Acero,
                         ),
                     )
 
@@ -240,7 +241,7 @@ fun NewReportScreen(
                     ) {
                         uiState.reportTypes.forEach { type ->
                             DropdownMenuItem(
-                                text = { Text(type.name, color = MaterialTheme.colorScheme.onBackground) },
+                                text = { Text(type.name, color = Acero) },
                                 onClick = {
                                     viewModel.onTypeSelect(type.id)
                                     typeExpanded = false
@@ -268,8 +269,8 @@ fun NewReportScreen(
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = Oro,
                             unfocusedBorderColor = VerdeMineral,
-                            focusedTextColor = MaterialTheme.colorScheme.onBackground,
-                            unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
+                            focusedTextColor = Acero,
+                            unfocusedTextColor = Acero,
                         ),
                     )
 
@@ -280,7 +281,7 @@ fun NewReportScreen(
                     ) {
                         uiState.processes.forEach { proc ->
                             DropdownMenuItem(
-                                text = { Text(proc.name, color = MaterialTheme.colorScheme.onBackground) },
+                                text = { Text(proc.name, color = Acero) },
                                 onClick = {
                                     viewModel.onProcessSelect(proc.id)
                                     processExpanded = false
@@ -307,8 +308,8 @@ fun NewReportScreen(
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = Oro,
                             unfocusedBorderColor = VerdeMineral,
-                            focusedTextColor = MaterialTheme.colorScheme.onBackground,
-                            unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
+                            focusedTextColor = Acero,
+                            unfocusedTextColor = Acero,
                         ),
                     )
 
@@ -319,7 +320,7 @@ fun NewReportScreen(
                     ) {
                         listOf("Turno 1 (Mañana)", "Turno 2 (Tarde)", "Turno 3 (Noche)").forEach { shiftOption ->
                             DropdownMenuItem(
-                                text = { Text(shiftOption, color = MaterialTheme.colorScheme.onBackground) },
+                                text = { Text(shiftOption, color = Acero) },
                                 onClick = {
                                     viewModel.onShiftSelect(shiftOption)
                                     shiftExpanded = false
@@ -350,8 +351,8 @@ fun NewReportScreen(
                             focusedBorderColor = if (uiState.areaError != null) Cobre else Oro,
                             unfocusedBorderColor = if (uiState.areaError != null) Cobre else VerdeMineral,
                             errorBorderColor = Cobre,
-                            focusedTextColor = MaterialTheme.colorScheme.onBackground,
-                            unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
+                            focusedTextColor = Acero,
+                            unfocusedTextColor = Acero,
                         ),
                     )
 
@@ -394,8 +395,8 @@ fun NewReportScreen(
                             focusedBorderColor = if (uiState.observationsError != null) Cobre else Oro,
                             unfocusedBorderColor = if (uiState.observationsError != null) Cobre else VerdeMineral,
                             errorBorderColor = Cobre,
-                            focusedTextColor = MaterialTheme.colorScheme.onBackground,
-                            unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
+                            focusedTextColor = Acero,
+                            unfocusedTextColor = Acero,
                         ),
                     )
 
