@@ -71,6 +71,7 @@ import cl.vitairos.industrial.domain.repository.ReportRepository
 import cl.vitairos.industrial.domain.repository.SyncRepository
 import cl.vitairos.industrial.ui.components.PrimaryButton
 import cl.vitairos.industrial.ui.theme.Acero
+import cl.vitairos.industrial.ui.theme.Hueso
 import cl.vitairos.industrial.ui.theme.Cobre
 import cl.vitairos.industrial.ui.theme.Niebla
 import cl.vitairos.industrial.ui.theme.Oro
@@ -159,7 +160,7 @@ fun NewReportScreen(
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Volver",
-                        tint = MaterialTheme.colorScheme.onBackground,
+                        tint = Hueso,
                     )
                 }
                 Spacer(modifier = Modifier.width(6.dp))
@@ -168,7 +169,7 @@ fun NewReportScreen(
                         text = "REGISTRO DE REPORTE",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onBackground,
+                        color = Hueso,
                     )
                     Text(
                         text = "METADATA, CAPTURA Y VALIDACIÓN LOCAL",
@@ -203,7 +204,7 @@ fun NewReportScreen(
                         Text(
                             text = "Reporte ${uiState.folio} encolado en Room + WorkManager. Redirigiendo...",
                             style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onBackground,
+                            color = Acero,
                             fontWeight = FontWeight.Bold,
                         )
                     }
@@ -270,7 +271,7 @@ fun NewReportScreen(
                         value = currentType,
                         onValueChange = {},
                         readOnly = true,
-                        label = { Text("Tipo de Reporte (Catálogo Cerrado *)", style = MaterialTheme.typography.bodySmall) },
+                        label = { Text("Tipo de Reporte (Catálogo Cerrado *)", color = Hueso, style = MaterialTheme.typography.bodySmall) },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = typeExpanded) },
                         modifier = Modifier
                             .menuAnchor()
@@ -278,8 +279,10 @@ fun NewReportScreen(
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = Oro,
                             unfocusedBorderColor = VerdeMineral,
-                            focusedTextColor = MaterialTheme.colorScheme.onBackground,
-                            unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
+                            focusedTextColor = Acero,
+                            unfocusedTextColor = Acero,
+                            focusedLabelColor = Hueso,
+                            unfocusedLabelColor = Hueso,
                         ),
                     )
 
@@ -310,7 +313,7 @@ fun NewReportScreen(
                         value = currentProcess,
                         onValueChange = {},
                         readOnly = true,
-                        label = { Text("Proceso Asociado (Lista Fija *)", style = MaterialTheme.typography.bodySmall) },
+                        label = { Text("Proceso Asociado (Lista Fija *)", color = Hueso, style = MaterialTheme.typography.bodySmall) },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = processExpanded) },
                         modifier = Modifier
                             .menuAnchor()
@@ -318,8 +321,10 @@ fun NewReportScreen(
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = Oro,
                             unfocusedBorderColor = VerdeMineral,
-                            focusedTextColor = MaterialTheme.colorScheme.onBackground,
-                            unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
+                            focusedTextColor = Acero,
+                            unfocusedTextColor = Acero,
+                            focusedLabelColor = Hueso,
+                            unfocusedLabelColor = Hueso,
                         ),
                     )
 
@@ -349,7 +354,7 @@ fun NewReportScreen(
                         value = uiState.shift,
                         onValueChange = {},
                         readOnly = true,
-                        label = { Text("Turno Operacional *", style = MaterialTheme.typography.bodySmall) },
+                        label = { Text("Turno Operacional *", color = Hueso, style = MaterialTheme.typography.bodySmall) },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = shiftExpanded) },
                         modifier = Modifier
                             .menuAnchor()
@@ -357,8 +362,10 @@ fun NewReportScreen(
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = Oro,
                             unfocusedBorderColor = VerdeMineral,
-                            focusedTextColor = MaterialTheme.colorScheme.onBackground,
-                            unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
+                            focusedTextColor = Acero,
+                            unfocusedTextColor = Acero,
+                            focusedLabelColor = Hueso,
+                            unfocusedLabelColor = Hueso,
                         ),
                     )
 
@@ -384,7 +391,7 @@ fun NewReportScreen(
                     OutlinedTextField(
                         value = uiState.areaOrSite,
                         onValueChange = viewModel::onAreaChange,
-                        label = { Text("Área / Faena Específica *", style = MaterialTheme.typography.bodySmall) },
+                        label = { Text("Área / Faena Específica *", color = Hueso, style = MaterialTheme.typography.bodySmall) },
                         placeholder = { Text("Ej: Planta Concentradora - Correa 04", color = Acero) },
                         singleLine = true,
                         isError = uiState.areaError != null,
@@ -400,8 +407,10 @@ fun NewReportScreen(
                             focusedBorderColor = if (uiState.areaError != null) Cobre else Oro,
                             unfocusedBorderColor = if (uiState.areaError != null) Cobre else VerdeMineral,
                             errorBorderColor = Cobre,
-                            focusedTextColor = MaterialTheme.colorScheme.onBackground,
-                            unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
+                            focusedTextColor = Acero,
+                            unfocusedTextColor = Acero,
+                            focusedLabelColor = Hueso,
+                            unfocusedLabelColor = Hueso,
                         ),
                     )
 
@@ -427,7 +436,7 @@ fun NewReportScreen(
                     OutlinedTextField(
                         value = uiState.observations,
                         onValueChange = viewModel::onObservationsChange,
-                        label = { Text("Observaciones de Campo *", style = MaterialTheme.typography.bodySmall) },
+                        label = { Text("Observaciones de Campo *", color = Hueso, style = MaterialTheme.typography.bodySmall) },
                         placeholder = { Text("Ingrese notas sobre anomalías o inspección...", color = Acero) },
                         minLines = 3,
                         maxLines = 5,
@@ -444,8 +453,10 @@ fun NewReportScreen(
                             focusedBorderColor = if (uiState.observationsError != null) Cobre else Oro,
                             unfocusedBorderColor = if (uiState.observationsError != null) Cobre else VerdeMineral,
                             errorBorderColor = Cobre,
-                            focusedTextColor = MaterialTheme.colorScheme.onBackground,
-                            unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
+                            focusedTextColor = Acero,
+                            unfocusedTextColor = Acero,
+                            focusedLabelColor = Hueso,
+                            unfocusedLabelColor = Hueso,
                         ),
                     )
 

@@ -50,6 +50,7 @@ import cl.vitairos.industrial.domain.model.UserRole
 import cl.vitairos.industrial.domain.repository.AuthRepository
 import cl.vitairos.industrial.ui.components.PrimaryButton
 import cl.vitairos.industrial.ui.theme.Acero
+import cl.vitairos.industrial.ui.theme.Hueso
 import cl.vitairos.industrial.ui.theme.Cobre
 import cl.vitairos.industrial.ui.theme.Niebla
 import cl.vitairos.industrial.ui.theme.Oro
@@ -103,7 +104,7 @@ fun LoginScreen(
                     Text(
                         text = "VITAIROS",
                         style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.onBackground,
+                        color = Hueso,
                         fontWeight = FontWeight.Bold,
                     )
                     Text(
@@ -185,8 +186,8 @@ fun LoginScreen(
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Cobre,
                     unfocusedBorderColor = VerdeMineral,
-                    focusedTextColor = MaterialTheme.colorScheme.onBackground,
-                    unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
+                    focusedTextColor = Acero,
+                    unfocusedTextColor = Acero,
                     focusedLabelColor = Cobre,
                     unfocusedLabelColor = Acero,
                 ),
@@ -206,8 +207,8 @@ fun LoginScreen(
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Cobre,
                     unfocusedBorderColor = VerdeMineral,
-                    focusedTextColor = MaterialTheme.colorScheme.onBackground,
-                    unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
+                    focusedTextColor = Acero,
+                    unfocusedTextColor = Acero,
                     focusedLabelColor = Cobre,
                     unfocusedLabelColor = Acero,
                 ),
@@ -281,7 +282,7 @@ private fun RoleSelectCard(
                 Text(
                     text = title,
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onBackground,
+                    color = Acero,
                     fontWeight = FontWeight.Bold,
                 )
                 Text(
