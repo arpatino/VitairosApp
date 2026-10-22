@@ -51,6 +51,7 @@ import cl.vitairos.industrial.domain.repository.AuthRepository
 import cl.vitairos.industrial.domain.repository.ReportRepository
 import cl.vitairos.industrial.ui.components.StatusChip
 import cl.vitairos.industrial.ui.theme.Acero
+import cl.vitairos.industrial.ui.theme.Hueso
 import cl.vitairos.industrial.ui.theme.Cobre
 import cl.vitairos.industrial.ui.theme.Niebla
 import cl.vitairos.industrial.ui.theme.Oro
@@ -104,7 +105,7 @@ fun DashboardScreen(
                             text = "VITAIROS INDUSTRIAL",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onBackground,
+                            color = Hueso,
                         )
                         Text(
                             text = "TERMINAL OPERACIONAL // DSY1105",
@@ -146,7 +147,7 @@ fun DashboardScreen(
                     Text(
                         text = if (uiState.isOnline) "ENLACE ACTIVO · SYNC EN SEGUNDO PLANO" else "MODO OFFLINE (FAENA) · PERSISTENCIA EN ROOM",
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onBackground,
+                        color = Acero,
                         fontWeight = FontWeight.Bold,
                     )
                 }
@@ -184,7 +185,7 @@ fun DashboardScreen(
                                 text = uiState.user?.displayName ?: "Juan Faena",
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onBackground,
+                                color = Acero,
                             )
                             Text(
                                 text = "${uiState.user?.role ?: UserRole.OPERATOR} // Turno 1 (Mañana)",
@@ -402,7 +403,7 @@ private fun ReportItemRow(report: Report) {
                     text = report.id,
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onBackground,
+                    color = Acero,
                 )
                 Text(
                     text = "${report.typeId} · ${report.processId}",
