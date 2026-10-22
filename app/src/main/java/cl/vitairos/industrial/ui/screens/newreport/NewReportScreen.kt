@@ -286,11 +286,11 @@ fun NewReportScreen(
                     ExposedDropdownMenu(
                         expanded = typeExpanded,
                         onDismissRequest = { typeExpanded = false },
-                        modifier = Modifier.background(VerdeProfundo),
+                        containerColor = androidx.compose.ui.graphics.Color.White, modifier = Modifier.background(androidx.compose.ui.graphics.Color.White),
                     ) {
                         uiState.reportTypes.forEach { type ->
                             DropdownMenuItem(
-                                text = { Text(type.name, color = MaterialTheme.colorScheme.onBackground) },
+                                text = { Text(type.name, color = VerdeNoche) },
                                 onClick = {
                                     viewModel.onTypeSelect(type.id)
                                     typeExpanded = false
@@ -326,11 +326,11 @@ fun NewReportScreen(
                     ExposedDropdownMenu(
                         expanded = processExpanded,
                         onDismissRequest = { processExpanded = false },
-                        modifier = Modifier.background(VerdeProfundo),
+                        containerColor = androidx.compose.ui.graphics.Color.White, modifier = Modifier.background(androidx.compose.ui.graphics.Color.White),
                     ) {
                         uiState.processes.forEach { proc ->
                             DropdownMenuItem(
-                                text = { Text(proc.name, color = MaterialTheme.colorScheme.onBackground) },
+                                text = { Text(proc.name, color = VerdeNoche) },
                                 onClick = {
                                     viewModel.onProcessSelect(proc.id)
                                     processExpanded = false
@@ -365,11 +365,11 @@ fun NewReportScreen(
                     ExposedDropdownMenu(
                         expanded = shiftExpanded,
                         onDismissRequest = { shiftExpanded = false },
-                        modifier = Modifier.background(VerdeProfundo),
+                        containerColor = androidx.compose.ui.graphics.Color.White, modifier = Modifier.background(androidx.compose.ui.graphics.Color.White),
                     ) {
                         listOf("Turno 1 (Mañana)", "Turno 2 (Tarde)", "Turno 3 (Noche)").forEach { shiftOption ->
                             DropdownMenuItem(
-                                text = { Text(shiftOption, color = MaterialTheme.colorScheme.onBackground) },
+                                text = { Text(shiftOption, color = VerdeNoche) },
                                 onClick = {
                                     viewModel.onShiftSelect(shiftOption)
                                     shiftExpanded = false

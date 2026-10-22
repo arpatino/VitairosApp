@@ -57,6 +57,9 @@ fun AppNavHost(
                 onNavigateToHistory = {
                     navController.navigate(Routes.HISTORY)
                 },
+                onNavigateToReportDetail = { reportId ->
+                    navController.navigate(Routes.reportDetail(reportId))
+                },
                 onSignedOut = {
                     navController.navigate(Routes.LOGIN) {
                         popUpTo(Routes.DASHBOARD) { inclusive = true }
@@ -88,20 +91,37 @@ fun AppNavHost(
         composable(
             Routes.REPORT_DETAIL,
             arguments = listOf(navArgument("reportId") { type = NavType.StringType }),
-        ) {
-            ReportDetailScreen(onBack = { navController.popBackStack() })
+        ) { backStackEntry ->
+            val reportId = backStackEntry.arguments?.getString("reportId") ?: ""
+            ReportDetailScreen(
+                reportId = reportId,
+                reportRepository = container.reportRepository,
+                authRepository = container.authRepository,
+                fileStore = container.fileStore,
+                syncRepository = container.syncRepository,
+                onBack = { navController.popBackStack() },
+            )
         }
 
         composable(Routes.QUEUE) {
             QueueScreen(
                 reportRepository = container.reportRepository,
                 syncRepository = container.syncRepository,
+                onReportClick = { reportId ->
+                    navController.navigate(Routes.reportDetail(reportId))
+                },
                 onBack = { navController.popBackStack() },
             )
         }
 
         composable(Routes.HISTORY) {
-            HistoryScreen(onBack = { navController.popBackStack() })
+            HistoryScreen(
+                reportRepository = container.reportRepository,
+                onReportClick = { reportId ->
+                    navController.navigate(Routes.reportDetail(reportId))
+                },
+                onBack = { navController.popBackStack() },
+            )
         }
 
         composable(Routes.SETTINGS) {

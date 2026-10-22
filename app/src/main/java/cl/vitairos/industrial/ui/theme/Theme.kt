@@ -55,7 +55,7 @@ fun VitairosTheme(
 ) {
     // Sin colores dinámicos: se respeta siempre la identidad visual de VITAIROS.
     MaterialTheme(
-        colorScheme = if (darkTheme) DarkColors else LightColors,
+        colorScheme = if (darkTheme) LightColors else DarkColors,
         typography = VitairosTypography,
         shapes = VitairosShapes,
         content = content,

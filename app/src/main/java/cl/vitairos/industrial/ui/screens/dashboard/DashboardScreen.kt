@@ -66,6 +66,7 @@ fun DashboardScreen(
     onNavigateToNewReport: () -> Unit,
     onNavigateToQueue: () -> Unit,
     onNavigateToHistory: () -> Unit,
+    onNavigateToReportDetail: (String) -> Unit = {},
     onSignedOut: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: DashboardViewModel = viewModel(
@@ -337,7 +338,7 @@ fun DashboardScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     items(uiState.recentReports) { report ->
-                        ReportItemRow(report = report)
+                        ReportItemRow(report = report, onClick = { onNavigateToReportDetail(report.id) })
                     }
                 }
             }
@@ -382,13 +383,14 @@ private fun MetricCard(
 }
 
 @Composable
-private fun ReportItemRow(report: Report) {
+private fun ReportItemRow(report: Report, onClick: () -> Unit = {}) {
     Card(
         colors = CardDefaults.cardColors(containerColor = VerdeProfundo),
         shape = RoundedCornerShape(8.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .border(1.dp, VerdeMineral, RoundedCornerShape(8.dp)),
+            .border(1.dp, VerdeMineral, RoundedCornerShape(8.dp))
+            .clickable(onClick = onClick),
     ) {
         Row(
             modifier = Modifier

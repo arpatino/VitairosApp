@@ -63,7 +63,7 @@ class PrivateFileStore(context: Context) {
             fileName = fileName,
             relativePath = fileName,
             sizeBytes = sizeBytes,
-            sha256 = null
+            sha256 = computeSha256(file)
         )
         return Pair(attachment, null)
     }
@@ -145,7 +145,7 @@ class PrivateFileStore(context: Context) {
                 fileName = originalName,
                 relativePath = savedFileName,
                 sizeBytes = destFile.length(),
-                sha256 = null
+                sha256 = computeSha256(destFile)
             )
             Pair(attachment, null)
         } catch (e: Exception) {
@@ -194,6 +194,23 @@ class PrivateFileStore(context: Context) {
             AttachmentRules.Violation.UnsupportedFormat -> "Formato no permitido. Solo se aceptan JPG, PNG o PDF."
             AttachmentRules.Violation.FileTooLarge -> "El archivo supera el tamaño máximo permitido de 10 MB."
             AttachmentRules.Violation.TooManyAttachments -> "Se alcanzó el máximo de 5 archivos adjuntos por reporte."
+        }
+    }
+
+    // Calcula el hash criptografico SHA-256 del archivo para trazabilidad y anti-duplicados
+    fun computeSha256(file: File): String {
+        return try {
+            val digest = java.security.MessageDigest.getInstance("SHA-256")
+            file.inputStream().use { input ->
+                val buffer = ByteArray(8192)
+                var bytesRead: Int
+                while (input.read(buffer).also { bytesRead = it } != -1) {
+                    digest.update(buffer, 0, bytesRead)
+                }
+            }
+            digest.digest().joinToString("") { "%02x".format(it) }
+        } catch (e: Exception) {
+            "SHA256_UNAVAILABLE"
         }
     }
 }
