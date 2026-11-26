@@ -49,7 +49,9 @@ import cl.vitairos.industrial.domain.model.Report
 import cl.vitairos.industrial.domain.model.UserRole
 import cl.vitairos.industrial.domain.repository.AuthRepository
 import cl.vitairos.industrial.domain.repository.ReportRepository
+import cl.vitairos.industrial.domain.repository.WeatherRepository
 import cl.vitairos.industrial.ui.components.StatusChip
+import cl.vitairos.industrial.ui.components.WeatherBanner
 import cl.vitairos.industrial.ui.theme.Acero
 import cl.vitairos.industrial.ui.theme.Hueso
 import cl.vitairos.industrial.ui.theme.Cobre
@@ -64,6 +66,7 @@ fun DashboardScreen(
     authRepository: AuthRepository,
     reportRepository: ReportRepository,
     connectivityObserver: ConnectivityObserver,
+    weatherRepository: WeatherRepository? = null,
     onNavigateToNewReport: () -> Unit,
     onNavigateToQueue: () -> Unit,
     onNavigateToHistory: () -> Unit,
@@ -71,7 +74,7 @@ fun DashboardScreen(
     onSignedOut: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: DashboardViewModel = viewModel(
-        factory = DashboardViewModel.factory(authRepository, reportRepository, connectivityObserver),
+        factory = DashboardViewModel.factory(authRepository, reportRepository, connectivityObserver, weatherRepository),
     ),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -160,7 +163,16 @@ fun DashboardScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Banner menor de clima en faena con Open-Meteo
+            WeatherBanner(
+                weather = uiState.weather,
+                isLoading = uiState.isWeatherLoading,
+                onRefresh = { viewModel.refreshWeather() },
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
 
             // Tarjeta de Usuario Activo y Telemetría
             Card(

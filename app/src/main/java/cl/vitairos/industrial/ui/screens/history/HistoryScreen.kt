@@ -51,6 +51,8 @@ import cl.vitairos.industrial.domain.repository.ReportRepository
 import cl.vitairos.industrial.ui.components.StatusChip
 import cl.vitairos.industrial.ui.theme.Acero
 import cl.vitairos.industrial.ui.theme.Cobre
+import cl.vitairos.industrial.ui.theme.ErrorLight
+import cl.vitairos.industrial.ui.theme.Hueso
 import cl.vitairos.industrial.ui.theme.Niebla
 import cl.vitairos.industrial.ui.theme.Oro
 import cl.vitairos.industrial.ui.theme.VerdeMineral
@@ -235,8 +237,8 @@ fun HistoryScreen(
                         onClick = { viewModel.onStatusFilterSelect(ReportStatus.ERROR) },
                         label = { Text("Con error (${uiState.errorCount})") },
                         colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = Color(0xFFB00020),
-                            selectedLabelColor = Color.White,
+                            selectedContainerColor = ErrorLight,
+                            selectedLabelColor = Hueso,
                             containerColor = VerdeProfundo,
                             labelColor = Niebla,
                         ),

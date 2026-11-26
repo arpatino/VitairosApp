@@ -289,7 +289,7 @@ fun NewReportScreen(
                     ExposedDropdownMenu(
                         expanded = typeExpanded,
                         onDismissRequest = { typeExpanded = false },
-                        containerColor = androidx.compose.ui.graphics.Color.White, modifier = Modifier.background(androidx.compose.ui.graphics.Color.White),
+                        containerColor = Hueso, modifier = Modifier.background(Hueso),
                     ) {
                         uiState.reportTypes.forEach { type ->
                             DropdownMenuItem(
@@ -331,7 +331,7 @@ fun NewReportScreen(
                     ExposedDropdownMenu(
                         expanded = processExpanded,
                         onDismissRequest = { processExpanded = false },
-                        containerColor = androidx.compose.ui.graphics.Color.White, modifier = Modifier.background(androidx.compose.ui.graphics.Color.White),
+                        containerColor = Hueso, modifier = Modifier.background(Hueso),
                     ) {
                         uiState.processes.forEach { proc ->
                             DropdownMenuItem(
@@ -372,7 +372,7 @@ fun NewReportScreen(
                     ExposedDropdownMenu(
                         expanded = shiftExpanded,
                         onDismissRequest = { shiftExpanded = false },
-                        containerColor = androidx.compose.ui.graphics.Color.White, modifier = Modifier.background(androidx.compose.ui.graphics.Color.White),
+                        containerColor = Hueso, modifier = Modifier.background(Hueso),
                     ) {
                         listOf("Turno 1 (Mañana)", "Turno 2 (Tarde)", "Turno 3 (Noche)").forEach { shiftOption ->
                             DropdownMenuItem(

@@ -28,6 +28,7 @@ import cl.vitairos.industrial.domain.model.ReportStatus
 import cl.vitairos.industrial.ui.theme.Acero
 import cl.vitairos.industrial.ui.theme.Cobre
 import cl.vitairos.industrial.ui.theme.ErrorLight
+import cl.vitairos.industrial.ui.theme.Hueso
 import cl.vitairos.industrial.ui.theme.Niebla
 import cl.vitairos.industrial.ui.theme.Oro
 import cl.vitairos.industrial.ui.theme.VerdeMineral
@@ -56,6 +57,6 @@ private fun ReportStatus.spec(): StatusSpec = when (this) {
     ReportStatus.QUEUED -> StatusSpec(R.string.status_queued, Icons.AutoMirrored.Filled.List, Oro, VerdeNoche)
     ReportStatus.SENDING -> StatusSpec(R.string.status_sending, Icons.Filled.Refresh, Cobre, VerdeNoche)
     ReportStatus.SYNCED -> StatusSpec(R.string.status_synced, Icons.Filled.Check, VerdeMineral, Niebla)
-    ReportStatus.ERROR -> StatusSpec(R.string.status_error, Icons.Filled.Warning, ErrorLight, Color.White)
+    ReportStatus.ERROR -> StatusSpec(R.string.status_error, Icons.Filled.Warning, ErrorLight, Hueso)
     ReportStatus.NEEDS_CORRECTION -> StatusSpec(R.string.status_needs_correction, Icons.Filled.Info, Oro, VerdeNoche)
 }

@@ -13,10 +13,13 @@ import cl.vitairos.industrial.data.repository.ReportRepositoryImpl
 import cl.vitairos.industrial.data.repository.SyncRepositoryImpl
 import cl.vitairos.industrial.data.sync.ConnectivityObserver
 import cl.vitairos.industrial.data.sync.SyncScheduler
+import cl.vitairos.industrial.data.remote.OpenMeteoWeatherDataSource
+import cl.vitairos.industrial.data.repository.WeatherRepositoryImpl
 import cl.vitairos.industrial.domain.repository.AuthRepository
 import cl.vitairos.industrial.domain.repository.CatalogRepository
 import cl.vitairos.industrial.domain.repository.ReportRepository
 import cl.vitairos.industrial.domain.repository.SyncRepository
+import cl.vitairos.industrial.domain.repository.WeatherRepository
 
 /** Inyección de dependencias manual (simple y explicable para el MVP). */
 class AppContainer(context: Context) {
@@ -36,6 +39,8 @@ class AppContainer(context: Context) {
     val authRepository: AuthRepository by lazy { AuthRepositoryImpl(sessionStore) }
     val catalogRepository: CatalogRepository by lazy { CatalogRepositoryImpl() }
     val syncRepository: SyncRepository by lazy { SyncRepositoryImpl(database.reportDao(), remote, syncScheduler) }
+    // Repositorio para consultar el clima en faena con Open-Meteo
+    val weatherRepository: WeatherRepository by lazy { WeatherRepositoryImpl(OpenMeteoWeatherDataSource()) }
     val saveDraftUseCase by lazy { cl.vitairos.industrial.domain.usecase.SaveDraftUseCase(reportRepository) }
     val deleteReportUseCase by lazy { cl.vitairos.industrial.domain.usecase.DeleteReportUseCase(reportRepository) }
 }

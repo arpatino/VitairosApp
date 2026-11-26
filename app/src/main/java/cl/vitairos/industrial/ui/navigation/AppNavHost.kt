@@ -48,6 +48,7 @@ fun AppNavHost(
                 authRepository = container.authRepository,
                 reportRepository = container.reportRepository,
                 connectivityObserver = container.connectivity,
+                weatherRepository = container.weatherRepository,
                 onNavigateToNewReport = {
                     navController.navigate(Routes.NEW_REPORT)
                 },
